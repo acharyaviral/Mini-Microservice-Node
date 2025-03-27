@@ -1,0 +1,5 @@
+touch client/.gitkeep
+touch comments/.gitkeep
+touch posts/.gitkeep
+git add .
+git commit -m "Ensure folders are tracked"
