@@ -1,67 +1,89 @@
-<h1>Microservices Architecture Project</h1>
+# Microservices Architecture Project
 
-<p>This repository contains a simple microservices-based application built with <strong>Node.js</strong>, <strong>Express</strong>, and <strong>React</strong>. The architecture is designed with independent services that communicate via a simple manual event bus, ensuring seamless data flow between them.</p>
+This repository contains a simple microservices-based application built with **Node.js**, **Express**, and **React**. The architecture is designed with independent services that communicate via a simple manual event bus, ensuring seamless data flow between them.
 
-<h2>Features</h2>
-<ul>
-  <li><strong>Create Post</strong>: Users can create new posts.</li>
-  <li><strong>Retrieve Posts</strong>: Fetches all existing posts.</li>
-  <li><strong>Create Comment</strong>: Adds a comment to a specific post.</li>
-  <li><strong>Retrieve Comments</strong>: Retrieves comments associated with a post.</li>
-  <li><strong>Event Bus</strong>: Facilitates communication between microservices using a manual event-driven approach.</li>
-</ul>
+## Features
+- **Create Post**: Users can create new posts.
+- **Retrieve Posts**: Fetches all existing posts.
+- **Create Comment**: Adds a comment to a specific post.
+- **Retrieve Comments**: Retrieves comments associated with a post.
+- **Moderation Service**: Automatically moderates comments based on predefined rules.
+- **Event Bus**: Facilitates communication between microservices using a manual event-driven approach.
+- **Query Service**: Maintains an in-memory data store that aggregates data from all past events.
 
-<h2>Tech Stack</h2>
-<ul>
-  <li><strong>Frontend</strong>: React.js</li>
-  <li><strong>Backend</strong>: Node.js, Express.js</li>
-  <li><strong>Communication</strong>: Custom manual event bus</li>
-</ul>
+## Tech Stack
+- **Frontend**: React.js
+- **Backend**: Node.js, Express.js
+- **Communication**: Custom manual event bus
 
-<h2>Architecture Overview</h2>
-<p>This project follows a microservices architecture, where each service is independent and communicates asynchronously through an event-driven model.</p>
+## Architecture Overview
+This project follows a microservices architecture, where each service is independent and communicates asynchronously through an event-driven model.
 
-<h3>Services</h3>
-<ol>
-  <li><strong>Posts Service</strong>: Handles post creation and retrieval.</li>
-  <li><strong>Comments Service</strong>: Manages comments related to posts.</li>
-  <li><strong>Event Bus</strong>: Ensures inter-service communication by propagating events.</li>
-  <li><strong>Client (Frontend)</strong>: React-based user interface for interacting with the services.</li>
-</ol>
+### Services
+1. **Posts Service**: Handles post creation and retrieval.
+2. **Comments Service**: Manages comments related to posts.
+3. **Moderation Service**: Reviews comments and assigns a status:
+   - `pending`: Initially assigned to all new comments.
+   - `approved`: Assigned if the comment passes moderation.
+   - `rejected`: Assigned if the comment contains restricted words (e.g., "redacted").
+4. **Query Service**: Maintains an in-memory data store and fetches all past events from the event bus for fast data retrieval.
+5. **Event Bus**: Ensures inter-service communication by propagating events between services.
+6. **Client (Frontend)**: React-based user interface for interacting with the services.
 
-<h2>Setup & Installation</h2>
+## Setup & Installation
 
-<h3>Prerequisites</h3>
-<p>Ensure you have the following installed:</p>
-<ul>
-  <li><strong>Node.js</strong> (latest LTS version)</li>
-  <li><strong>npm</strong> or <strong>yarn</strong></li>
-</ul>
+### Prerequisites
+Ensure you have the following installed:
+- **Node.js** (latest LTS version)
+- **npm** or **yarn**
 
-<h3>Steps to Run the Project</h3>
-<ol>
-  <li>Clone the repository:
-    <pre><code>git clone &lt;repository-url&gt;
-cd &lt;project-folder&gt;</code></pre>
-  </li>
-  <li>Install dependencies for each service:
-    <pre><code>npm install</code></pre>
-  </li>
-  <li>Start each service:
-    <pre><code>npm start</code></pre>
-  </li>
-  <li>Start the event bus:
-    <pre><code>node event-bus.js</code></pre>
-  </li>
-  <li>Start the frontend application:
-    <pre><code>cd client
-npm start</code></pre>
-  </li>
-  <li>Open the browser and navigate to <code>http://localhost:3000</code>.</li>
-</ol>
+### Steps to Run the Project
+1. Clone the repository:
+   ```sh
+   git clone <repository-url>
+   cd <project-folder>
+   ```
+2. Install dependencies for each service:
+   ```sh
+   npm install
+   ```
+3. Start each service:
+   ```sh
+   npm start
+   ```
+4. Start the event bus:
+   ```sh
+   node event-bus.js
+   ```
+5. Start the moderation service:
+   ```sh
+   node moderation.js
+   ```
+6. Start the query service:
+   ```sh
+   node query.js
+   ```
+7. Start the frontend application:
+   ```sh
+   cd client
+   npm start
+   ```
+8. Open the browser and navigate to `http://localhost:3000`.
 
+## Moderation Rules
+The moderation service scans comments for restricted words. If a comment contains the word "redacted," it is automatically rejected. Otherwise, it is approved.
 
+## Query Service Functionality
+- Maintains an in-memory data store of posts and comments.
+- Fetches all past events from the event bus on startup to reconstruct the application state.
+- Provides fast retrieval of aggregated data for the frontend.
 
+## Event Flow
+1. A user submits a comment.
+2. The event bus broadcasts a `CommentCreated` event.
+3. The moderation service processes the comment and emits a `CommentModerated` event with an updated status.
+4. The comments service updates the status accordingly and emits a `CommentUpdated` event.
+5. The query service listens to all events and updates its in-memory store.
+6. The frontend fetches data from the query service for efficient rendering.
 
-
-
+This event-driven approach ensures scalability and loose coupling between services.
